@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+      - smtp-server
+  db:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=mydb-dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+  smtp-server:
+    image: mailhog/mailhog
+    expose:
+      - 1025
+      - 8025
+    ports:
+      - '1025:1025'
+      - '8025:8025'
